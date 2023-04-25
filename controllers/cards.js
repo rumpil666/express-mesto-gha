@@ -26,11 +26,11 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .then((deletedCard, card) => {
+    .then((card) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       } else {
-        res.status(200).send(deletedCard);
+        res.status(200).send(card);
       }
     })
     .catch((e) => {
