@@ -22,14 +22,6 @@ const userSchema = new mongoose.Schema({
       },
     },
   },
-  _id: {
-    type: String,
-    validate: {
-      validator(v) {
-        return /^\w+$/.test(v);
-      },
-    },
-  },
 });
 
 module.exports = mongoose.model('user', userSchema);
