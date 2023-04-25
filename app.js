@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const errorHandler = require('./middlewares/errorHandler');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -23,6 +24,10 @@ app.use((req, res, next) => {
 
 app.use(userRouter);
 app.use(cardRouter);
+
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
 
 app.use(errorHandler);
 

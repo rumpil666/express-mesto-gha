@@ -28,8 +28,11 @@ module.exports.getUserById = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((e) => {
-      if (e.name === 'CastError') {
+      console.log('e =>', e.name);
+      if (e.name === 'NotFound') {
         next(new NotFoundError('Пользователь не найден'));
+      } if (e.name === 'CastError') {
+        next(new BadRequestError('Некоректный id'));
       } else {
         next(e);
       }
