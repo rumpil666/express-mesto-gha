@@ -34,8 +34,8 @@ module.exports.deleteCard = (req, res, next) => {
       }
     })
     .catch((e) => {
-      if (e.name === 'ValidationError') {
-        next(new NotFoundError('Такой карточки не существует'));
+      if (e.name === 'CastError') {
+        next(new BadRequestError('Некорректный ID карточки'));
       } else {
         next(e);
       }
@@ -57,7 +57,7 @@ module.exports.likeCard = (req, res, next) => {
     })
     .catch((e) => {
       console.log('e =>', e.name);
-      if (e.name === 'ValidationError') {
+      if (e.name === 'CastError') {
         next(new BadRequestError('Некорректный ID карточки'));
       } else {
         next(e);
@@ -80,7 +80,7 @@ module.exports.dislikeCard = (req, res, next) => {
     })
     .catch((e) => {
       console.log('e =>', e.name);
-      if (e.name === 'ValidationError') {
+      if (e.name === 'CastError') {
         next(new BadRequestError('Некорректный ID карточки'));
       } else {
         next(e);
