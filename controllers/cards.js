@@ -42,11 +42,17 @@ module.exports.likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError('Такой карточки не существует');
+      } else {
+        res.status(200).send(card);
+      }
+    })
     .catch((e, card) => {
       console.log('e =>', e.name);
       if (!card) {
-        next(new NotFoundError('Такой карточки не существует'));
+        next(new BadRequestError('Некорректный ID карточки'));
       } else {
         next(e);
       }
@@ -59,10 +65,17 @@ module.exports.dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.status(200).send(card))
-    .catch((e, card) => {
+    .then((card) => {
       if (!card) {
-        next(new NotFoundError('Такой карточки не существует'));
+        throw new NotFoundError('Такой карточки не существует');
+      } else {
+        res.status(200).send(card);
+      }
+    })
+    .catch((e, card) => {
+      console.log('e =>', e.name);
+      if (!card) {
+        next(new BadRequestError('Некорректный ID карточки'));
       } else {
         next(e);
       }
