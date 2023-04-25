@@ -25,13 +25,14 @@ module.exports.createUsers = (req, res, next) => {
 module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
-      res.status(200).send(user);
-    })
-    .catch((e, user) => {
-      console.log('e =>', e.stack);
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
-      } if (e.name === 'CastError') {
+        throw new NotFoundError('Пользователь не найден');
+      } else {
+        res.status(200).send(user);
+      }
+    })
+    .catch((e) => {
+      if (e.name === 'CastError') {
         next(new BadRequestError('Некоректный id'));
       } else {
         next(e);
