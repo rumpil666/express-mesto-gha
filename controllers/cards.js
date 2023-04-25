@@ -26,9 +26,15 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
-    .then((deletedCard) => res.status(200).send(deletedCard))
-    .catch((e, card) => {
+    .then((deletedCard, card) => {
       if (!card) {
+        throw new NotFoundError('Такой карточки не существует');
+      } else {
+        res.status(200).send(deletedCard);
+      }
+    })
+    .catch((e) => {
+      if (e.name === 'ValidationError') {
         next(new NotFoundError('Такой карточки не существует'));
       } else {
         next(e);
@@ -49,9 +55,9 @@ module.exports.likeCard = (req, res, next) => {
         res.status(200).send(card);
       }
     })
-    .catch((e, card) => {
+    .catch((e) => {
       console.log('e =>', e.name);
-      if (!card) {
+      if (e.name === 'ValidationError') {
         next(new BadRequestError('Некорректный ID карточки'));
       } else {
         next(e);
@@ -72,9 +78,9 @@ module.exports.dislikeCard = (req, res, next) => {
         res.status(200).send(card);
       }
     })
-    .catch((e, card) => {
+    .catch((e) => {
       console.log('e =>', e.name);
-      if (!card) {
+      if (e.name === 'ValidationError') {
         next(new BadRequestError('Некорректный ID карточки'));
       } else {
         next(e);
