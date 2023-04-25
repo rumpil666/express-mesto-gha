@@ -29,7 +29,7 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((e) => {
       console.log('e =>', e.name);
-      if (e.name === 'NotFound') {
+      if (e.name === 'NotFoundError') {
         next(new NotFoundError('Пользователь не найден'));
       } if (e.name === 'CastError') {
         next(new BadRequestError('Некоректный id'));
