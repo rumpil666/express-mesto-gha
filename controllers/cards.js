@@ -4,7 +4,7 @@ const BadRequestError = require('../errors/BadRequestError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.send(cards))
     .catch(next);
 };
 
@@ -12,7 +12,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.status(201).send(card))
     .catch((e) => {
       console.log('e =>', e.name);
       if (e.name === 'ValidationError') {
@@ -30,7 +30,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       } else {
-        res.status(200).send(card);
+        res.send(card);
       }
     })
     .catch((e) => {
@@ -52,7 +52,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       } else {
-        res.status(200).send(card);
+        res.send(card);
       }
     })
     .catch((e) => {
@@ -75,7 +75,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
       } else {
-        res.status(200).send(card);
+        res.send(card);
       }
     })
     .catch((e) => {

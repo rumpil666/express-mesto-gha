@@ -4,7 +4,7 @@ const BadRequestError = require('../errors/BadRequestError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send({ users }))
+    .then((users) => res.send({ users }))
     .catch(next);
 };
 
@@ -12,7 +12,7 @@ module.exports.createUsers = (req, res, next) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((users) => res.status(200).send({ users }))
+    .then((users) => res.status(201).send({ users }))
     .catch((e) => {
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
@@ -28,7 +28,7 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
       } else {
-        res.status(200).send(user);
+        res.send(user);
       }
     })
     .catch((e) => {
@@ -47,7 +47,7 @@ module.exports.updateUser = (req, res, next) => {
     { name, about },
     { new: true, runValidators: true },
   )
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
     .catch((e, user) => {
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
@@ -66,7 +66,7 @@ module.exports.updateAvatar = (req, res, next) => {
     { avatar },
     { new: true, runValidators: true },
   )
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
     .catch((e, user) => {
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении аватара'));
