@@ -1,3 +1,4 @@
+const httpConstants = require('http2').constants;
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
@@ -12,7 +13,7 @@ module.exports.createUsers = (req, res, next) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((users) => res.status(201).send({ users }))
+    .then((users) => res.status(httpConstants.HTTP_STATUS_CREATED).send({ users }))
     .catch((e) => {
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));

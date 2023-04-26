@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const errorHandler = require('./middlewares/errorHandler');
-const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards');
+const { userRouter, cardRouter } = require('./routes');
 const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
@@ -21,7 +20,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(userRouter);
+app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 
 app.use('*', (req, res, next) => {
@@ -29,5 +28,7 @@ app.use('*', (req, res, next) => {
 });
 
 app.use(errorHandler);
+
+console.log('adsfasasga =========>', mongoose.Error);
 
 app.listen(PORT);

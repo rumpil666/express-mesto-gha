@@ -1,9 +1,11 @@
+const httpConstants = require('http2').constants;
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((cards) => res.send(cards))
     .catch(next);
 };
@@ -12,7 +14,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send(card))
+    .then((card) => res.status(httpConstants.HTTP_STATUS_CREATED).send(card))
     .catch((e) => {
       console.log('e =>', e.name);
       if (e.name === 'ValidationError') {
