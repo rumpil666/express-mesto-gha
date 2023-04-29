@@ -29,6 +29,4 @@ app.use('*', (req, res, next) => {
 
 app.use(errorHandler);
 
-console.log('adsfasasga =========>', mongoose.Error);
-
 app.listen(PORT);
