@@ -5,6 +5,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
+const ConflictError = require('../errors/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -50,6 +51,8 @@ module.exports.createUser = (req, res, next) => {
     .catch((e) => {
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+      } else if (e.code === 11000) {
+        next(new ConflictError('Такой пользователь уже существует.'));
       } else {
         next(e);
       }
@@ -118,9 +121,10 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       if (!user || !password) {
         next(new UnauthorizedError('Неправильный логин или пароль.'));
+      } else {
+        const token = jwt.sign({ _id: user._id }, 'extra-strong-secret', { expiresIn: '7d' });
+        res.send({ token });
       }
-      const token = jwt.sign({ _id: user._id }, 'extra-strong-secret', { expiresIn: '7d' });
-      res.send({ token });
     })
     .catch(next);
 };
