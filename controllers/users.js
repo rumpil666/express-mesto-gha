@@ -1,7 +1,10 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const httpConstants = require('http2').constants;
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -9,11 +12,41 @@ module.exports.getUsers = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.createUsers = (req, res, next) => {
-  const { name, about, avatar } = req.body;
+module.exports.getCurrentUser = (req, res, next) => {
+  const { _id } = req.user;
+  User.findById(_id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      } else {
+        res.send({ user });
+      }
+    })
+    .catch(next);
+};
 
-  User.create({ name, about, avatar })
-    .then((users) => res.status(httpConstants.HTTP_STATUS_CREATED).send({ users }))
+module.exports.createUser = (req, res, next) => {
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
+  if (!email || !password) {
+    next(new UnauthorizedError('Неправильный логин или пароль.'));
+  }
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      email,
+      password: hash,
+      name,
+      about,
+      avatar,
+    }))
+    .then((user) => res.status(httpConstants.HTTP_STATUS_CREATED).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      _id: user._id,
+      email: user.email,
+    }))
     .catch((e) => {
       if (e.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
@@ -40,11 +73,6 @@ module.exports.getUserById = (req, res, next) => {
       }
     });
 };
-
-// Не получается разобраться как использовать нормально декоратор. Нам необходимо изменить
-// аргумент в общей логике (name, about) или avatar. Изменять с помощью apply. Но как это сделать
-// если мы напрямую не передаем их в функции а только обьявляем в ней мне недостаточно понятно.
-// Могли бы вы уточнить этот вопрос если вам несложно. Хочется разобраться но пока не выходит
 
 module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
@@ -82,4 +110,17 @@ module.exports.updateAvatar = (req, res, next) => {
         next(e);
       }
     });
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      if (!user || !password) {
+        next(new UnauthorizedError('Неправильный логин или пароль.'));
+      }
+      const token = jwt.sign({ _id: user._id }, 'extra-strong-secret', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch(next);
 };
