@@ -1,12 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/errorHandler');
 const auth = require('./middlewares/auth');
 const { userRouter, cardRouter } = require('./routes');
 const NotFoundError = require('./errors/NotFoundError');
 const { login, createUser } = require('./controllers/users');
 const { validationLogin, validationCreateUser } = require('./middlewares/validations');
-const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const app = express();
