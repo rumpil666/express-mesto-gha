@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/errorHandler');
-const auth = require('./middlewares/auth');
+// const auth = require('./middlewares/auth');
 const { userRouter, cardRouter } = require('./routes');
 const NotFoundError = require('./errors/NotFoundError');
 const { login, createUser } = require('./controllers/users');
@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/signin', validationLogin, login);
 app.post('/signup', validationCreateUser, createUser);
 
-app.use(auth);
+// app.use(auth);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
