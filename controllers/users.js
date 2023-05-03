@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const httpConstants = require('http2').constants;
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
 const ConflictError = require('../errors/ConflictError');
 
 module.exports.getUsers = (req, res, next) => {
@@ -103,12 +102,8 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user || !password) {
-        next(new UnauthorizedError('Неправильный логин или пароль.'));
-      } else {
-        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-        res.send({ token });
-      }
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
     })
     .catch(next);
 };
