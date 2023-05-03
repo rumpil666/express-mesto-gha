@@ -5,11 +5,11 @@ const errorHandler = (err, req, res, next) => {
   console.log(err.stack || err);
   const { message } = err;
   if (status === httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR) {
-    res.status('Ошибка сервера').send({
+    res.status(status).send({
       err,
     });
   } else {
-    res.status(err.message).send({
+    res.status(status).send({
       err,
       message,
     });
