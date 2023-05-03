@@ -9,7 +9,7 @@ const errorHandler = (err, req, res, next) => {
       err,
     });
   } else {
-    res.status(status).send({
+    res.message(err.message).send({
       err,
       message,
     });
